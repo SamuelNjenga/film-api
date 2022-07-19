@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Genre.init(
     {
-      name: { type: DataTypes.STRING, allowNull: false },
+      name: { type: DataTypes.STRING, allowNull: false, unique: true },
     },
     {
       sequelize,

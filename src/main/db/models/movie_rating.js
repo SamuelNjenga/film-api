@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      rating: { type: Sequelize.INTEGER, allowNull: false },
+      rating: { type: DataTypes.INTEGER, allowNull: false },
       actorId: {
         type: DataTypes.INTEGER,
         allowNull: false,
