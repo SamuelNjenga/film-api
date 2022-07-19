@@ -1,0 +1,38 @@
+{
+  "name": "film_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sam Njenga",
+  "license": "ISC",
+  "dependencies": {
+    "accesscontrol": "^2.2.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.0",
+    "cloudinary": "^1.30.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "ejs": "^3.1.8",
+    "email-templates": "^10.0.0",
+    "express": "^4.18.1",
+    "express-rate-limit": "^6.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.4",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.3.3",
+    "node-input-validator": "^4.5.0",
+    "nodemailer": "^6.7.7",
+    "sequelize": "^6.21.3",
+    "twilio": "^3.79.0",
+    "uuid": "^8.3.2",
+    "winston": "^3.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19",
+    "sequelize-cli": "^6.4.1"
+  }
+}
