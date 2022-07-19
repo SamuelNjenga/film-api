@@ -22,6 +22,13 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: false,
         },
       });
+      Movie.hasMany(models.Movie_Rating, {
+        onDelete: "restrict",
+        foreignKey: {
+          name: "movieId",
+          allowNull: false,
+        },
+      });
     }
   }
   Movie.init(
