@@ -11,7 +11,7 @@ exports.createGenre = async (req, res, next) => {
       name: req.body.name,
     };
     await genreService.createGenre(data);
-    res.status(201).json({ data, message: `A new Genre has been created` });
+    res.status(201).json({ data, message: `A new genre has been created` });
   } catch (err) {
     next(err);
   }
