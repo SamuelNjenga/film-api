@@ -1,8 +1,10 @@
 const { sequelize } = require("../db/models");
 
 const actorService = require("../services/ActorService");
+const CLIENT_PHONE_NUMBER = "+254740700076";
 
 const ReqValidator = require("../utils/validator");
+const sendSms = require("../utils/twilio");
 
 exports.createActor = async (req, res, next) => {
   try {
@@ -20,6 +22,10 @@ exports.createActor = async (req, res, next) => {
       phoneNumber: req.body.phoneNumber,
     };
     await actorService.createActor(data);
+    sendSms(
+      CLIENT_PHONE_NUMBER,
+      `Thanks ${data.firstName}  ${data.lastName} for creating an account in our system. You can now go ahead and log on to the system.`
+    );
     res.status(201).json({ data, message: `A new actor has been created` });
   } catch (err) {
     next(err);
