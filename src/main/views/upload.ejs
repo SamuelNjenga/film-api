@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head> </head>
+  <body>
+    <h1>Upload Image</h1>
+    <form
+      method="POST"
+      action="/api/v1/uploads/upload-images"
+      enctype="multipart/form-data"
+    >
+      <input type="file" name="picture" multiple />
+      <input type="submit" />
+    </form>
+  </body>
+</html>

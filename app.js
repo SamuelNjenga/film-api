@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
  * Setup Morgan
  */
 const morgan = require("morgan");
+const path = require("path");
 
 /**
  *
@@ -65,9 +66,19 @@ const apiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 60 minutes
   max: 1000,
 });
+
+// app.set("views", path.join(__dirname, "./src/main/views"));
+// app.set("view engine", "ejs");
+
+// app.get("/upload", (req, res) => {
+//   res.render("upload");
+// });
+
 app.use("/api/", apiLimiter);
 
 app.use("/api/v1/", routes);
+
+
 
 // import etag from 'etag';
 // res.setHeader('ETag', etag(body));
