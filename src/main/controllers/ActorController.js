@@ -69,7 +69,7 @@ exports.updateActor = async (req, res, next) => {
     const actor = await actorService.getActor(actorId);
 
     if (!actor) {
-    await transaction.commit();
+      await transaction.commit();
       return res
         .status(200)
         .json({ message: `Actor ${actorId} does not exist in our database` });
@@ -95,17 +95,35 @@ exports.updateActor = async (req, res, next) => {
 };
 
 exports.deleteActor = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
+
   try {
     const actorId = req.params.id;
-    await actorService.deleteActor({
-      where: {
-        id: actorId,
+
+    const actor = await actorService.getActor(actorId);
+
+    if (!actor) {
+      await transaction.commit();
+      return res
+        .status(200)
+        .json({ message: `Actor ${actorId} does not exist in our database` });
+    }
+
+    await actorService.deleteActor(
+      {
+        where: {
+          id: actorId,
+        },
       },
-    });
+      transaction
+    );
+
+    await transaction.commit();
     res.status(200).json({
       message: `Actor ${actorId} has been deleted`,
     });
   } catch (error) {
+    transaction.rollback();
     next(error);
   }
 };
