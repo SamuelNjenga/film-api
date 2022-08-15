@@ -49,6 +49,7 @@ exports.getActors = async (req, res, next) => {
 };
 
 exports.updateActor = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const valid = await ReqValidator.validate(req, res, {
       firstName: "string",
@@ -64,15 +65,21 @@ exports.updateActor = async (req, res, next) => {
       phoneNumber: req.body.phoneNumber,
     };
     const actorId = req.params.id;
-    await actorService.updateActor(data, {
-      where: {
-        id: actorId,
+    await actorService.updateActor(
+      data,
+      {
+        where: {
+          id: actorId,
+        },
       },
-    });
+      transaction
+    );
+    await transaction.commit();
     res
       .status(200)
       .json({ data, message: `Actor ${actorId} has been updated` });
   } catch (err) {
+    transaction.rollback();
     next(err);
   }
 };
