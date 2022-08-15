@@ -7,6 +7,7 @@ const ReqValidator = require("../utils/validator");
 const sendSms = require("../utils/twilio");
 
 exports.createActor = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const valid = await ReqValidator.validate(req, res, {
       firstName: "required|string",
@@ -21,13 +22,16 @@ exports.createActor = async (req, res, next) => {
       email: req.body.email,
       phoneNumber: req.body.phoneNumber,
     };
-    await actorService.createActor(data);
+    await actorService.createActor(data, transaction);
     sendSms(
       CLIENT_PHONE_NUMBER,
-      `Thanks ${data.firstName}  ${data.lastName} for creating an account in our system. You can now go ahead and log on to the system.`
+      `Thanks ${data.firstName}  ${data.lastName} for creating an account in our system. You can now go ahead and log on to the system.`,
+      transaction
     );
+    await transaction.commit();
     res.status(201).json({ data, message: `A new actor has been created` });
   } catch (err) {
+    transaction.rollback();
     next(err);
   }
 };
