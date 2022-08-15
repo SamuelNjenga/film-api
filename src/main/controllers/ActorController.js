@@ -65,6 +65,16 @@ exports.updateActor = async (req, res, next) => {
       phoneNumber: req.body.phoneNumber,
     };
     const actorId = req.params.id;
+
+    const actor = await actorService.getActor(actorId);
+
+    if (!actor) {
+    await transaction.commit();
+      return res
+        .status(200)
+        .json({ message: `Actor ${actorId} does not exist in our database` });
+    }
+
     await actorService.updateActor(
       data,
       {
