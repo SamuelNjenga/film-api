@@ -36,6 +36,7 @@ exports.getGenres = async (req, res, next) => {
 };
 
 exports.updateGenre = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const valid = await ReqValidator.validate(req, res, {
       name: "required|string",
@@ -46,15 +47,31 @@ exports.updateGenre = async (req, res, next) => {
     };
 
     const genreId = req.params.id;
-    await genreService.updateGenre(data, {
-      where: {
-        id: genreId,
+
+    const genre = await genreService.getGenre(genreId);
+
+    if (!genre) {
+      await transaction.commit();
+      return res
+        .status(200)
+        .json({ message: `Genre ${genreId} does not exist in our database` });
+    }
+
+    await genreService.updateGenre(
+      data,
+      {
+        where: {
+          id: genreId,
+        },
       },
-    });
+      transaction
+    );
+    await transaction.commit();
     res
       .status(200)
       .json({ data, message: `Genre ${genreId} has been updated` });
   } catch (err) {
+    transaction.rollback();
     next(err);
   }
 };

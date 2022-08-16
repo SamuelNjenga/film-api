@@ -12,6 +12,10 @@ exports.getGenres = async () => {
   return db.Genre.findAll();
 };
 
+exports.getGenre = async (data) => {
+  return db.Genre.findByPk(data);
+};
+
 exports.deleteGenre = async (data) => {
   return db.Genre.destroy(data);
 };
