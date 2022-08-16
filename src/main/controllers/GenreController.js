@@ -77,17 +77,33 @@ exports.updateGenre = async (req, res, next) => {
 };
 
 exports.deleteGenre = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const genreId = req.params.id;
-    await genreService.deleteGenre({
-      where: {
-        id: genreId,
+
+    const genre = await genreService.getGenre(genreId);
+
+    if (!genre) {
+      await transaction.commit();
+      return res
+        .status(200)
+        .json({ message: `Genre ${genreId} does not exist in our database` });
+    }
+
+    await genreService.deleteGenre(
+      {
+        where: {
+          id: genreId,
+        },
       },
-    });
+      transaction
+    );
+    await transaction.commit();
     res.status(200).json({
       message: `Genre ${genreId} has been deleted`,
     });
   } catch (error) {
+    transaction.rollback();
     next(error);
   }
 };
