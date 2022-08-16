@@ -1,7 +1,11 @@
+const { sequelize } = require("../db/models");
+
 const genreService = require("../services/GenreService");
+
 const ReqValidator = require("../utils/validator");
 
 exports.createGenre = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const valid = await ReqValidator.validate(req, res, {
       name: "required|string",
@@ -10,9 +14,11 @@ exports.createGenre = async (req, res, next) => {
     const data = {
       name: req.body.name,
     };
-    await genreService.createGenre(data);
+    await genreService.createGenre(data, transaction);
+    await transaction.commit();
     res.status(201).json({ data, message: `A new genre has been created` });
   } catch (err) {
+    transaction.rollback();
     next(err);
   }
 };
