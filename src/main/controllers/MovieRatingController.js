@@ -64,9 +64,9 @@ exports.updateMovie_Rating = async (req, res, next) => {
 
     if (!movieRating) {
       await transaction.commit();
-      return res
-        .status(200)
-        .json({ message: `Movie_Rating ${movieRatingId} does not exist in our database` });
+      return res.status(200).json({
+        message: `Movie_Rating ${movieRatingId} does not exist in our database`,
+      });
     }
 
     await movieRatingService.updateMovie_Rating(
@@ -90,17 +90,34 @@ exports.updateMovie_Rating = async (req, res, next) => {
 };
 
 exports.deleteMovie_Rating = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
+
   try {
     const movieRatingId = req.params.id;
-    await movieRatingService.deleteMovie_Rating({
-      where: {
-        id: movieRatingId,
+
+    const movieRating = await movieRatingService.getMovie_Rating(movieRatingId);
+
+    if (!movieRating) {
+      await transaction.commit();
+      return res.status(200).json({
+        message: `Movie_Rating ${movieRatingId} does not exist in our database`,
+      });
+    }
+
+    await movieRatingService.deleteMovie_Rating(
+      {
+        where: {
+          id: movieRatingId,
+        },
       },
-    });
+      transaction
+    );
+    await transaction.commit();
     res.status(200).json({
       message: `Movie_Rating ${movieRatingId} has been deleted`,
     });
   } catch (error) {
+    transaction.rollback();
     next(error);
   }
 };
