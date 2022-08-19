@@ -90,17 +90,32 @@ exports.updateMovie = async (req, res, next) => {
 };
 
 exports.deleteMovie = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const movieId = req.params.id;
-    await movieService.deleteMovie({
-      where: {
-        id: movieId,
+    const movie = await movieService.getMovie(movieId);
+
+    if (!movie) {
+      await transaction.commit();
+      return res
+        .status(200)
+        .json({ message: `Movie ${movieId} does not exist in our database` });
+    }
+
+    await movieService.deleteMovie(
+      {
+        where: {
+          id: movieId,
+        },
       },
-    });
+      transaction
+    );
+    await transaction.commit();
     res.status(200).json({
       message: `Movie ${movieId} has been deleted`,
     });
   } catch (error) {
+    transaction.rollback();
     next(error);
   }
 };
