@@ -1,8 +1,12 @@
+const { sequelize } = require("../db/models");
+
 const movieRatingService = require("../services/MovieRatingService");
 
 const ReqValidator = require("../utils/validator");
 
 exports.createMovie_Rating = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
+
   try {
     const valid = await ReqValidator.validate(req, res, {
       movieId: "required|integer",
@@ -15,11 +19,13 @@ exports.createMovie_Rating = async (req, res, next) => {
       actorId: req.body.actorId,
       rating: req.body.rating,
     };
-    await movieRatingService.createMovie_Rating(data);
+    await movieRatingService.createMovie_Rating(data, transaction);
+    await transaction.commit();
     res
       .status(201)
       .json({ data, message: `A new movie_rating has been created` });
   } catch (err) {
+    transaction.rollback();
     next(err);
   }
 };
@@ -37,6 +43,8 @@ exports.getMovies_Ratings = async (req, res, next) => {
 };
 
 exports.updateMovie_Rating = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
+
   try {
     const valid = await ReqValidator.validate(req, res, {
       movieId: "integer",
@@ -51,16 +59,32 @@ exports.updateMovie_Rating = async (req, res, next) => {
     };
 
     const movieRatingId = req.params.id;
-    await movieRatingService.updateMovie_Rating(data, {
-      where: {
-        id: movieRatingId,
+
+    const movieRating = await movieRatingService.getMovie_Rating(movieRatingId);
+
+    if (!movieRating) {
+      await transaction.commit();
+      return res
+        .status(200)
+        .json({ message: `Movie_Rating ${movieRatingId} does not exist in our database` });
+    }
+
+    await movieRatingService.updateMovie_Rating(
+      data,
+      {
+        where: {
+          id: movieRatingId,
+        },
       },
-    });
+      transaction
+    );
+    await transaction.commit();
     res.status(200).json({
       data,
       message: `Movie_Rating ${movieRatingId} has been updated`,
     });
   } catch (err) {
+    transaction.rollback();
     next(err);
   }
 };
