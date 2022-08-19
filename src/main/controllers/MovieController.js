@@ -5,6 +5,7 @@ const movieService = require("../services/MovieService");
 const ReqValidator = require("../utils/validator");
 
 exports.createMovie = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const valid = await ReqValidator.validate(req, res, {
       title: "required|string",
@@ -19,9 +20,14 @@ exports.createMovie = async (req, res, next) => {
       genreId: req.body.genreId,
       releaseDate: req.body.releaseDate,
     };
-    await movieService.createMovie(data);
+
+    await movieService.createMovie(data, transaction);
+
+    await transaction.commit();
+
     res.status(201).json({ data, message: `A new movie has been created` });
   } catch (err) {
+    transaction.rollback();
     next(err);
   }
 };
@@ -39,6 +45,7 @@ exports.getMovies = async (req, res, next) => {
 };
 
 exports.updateMovie = async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const valid = await ReqValidator.validate(req, res, {
       title: "string",
@@ -53,15 +60,31 @@ exports.updateMovie = async (req, res, next) => {
       releaseDate: req.body.releaseDate,
     };
     const movieId = req.params.id;
-    await movieService.updateMovie(data, {
-      where: {
-        id: movieId,
+
+    const movie = await movieService.getMovie(movieId);
+
+    if (!movie) {
+      await transaction.commit();
+      return res
+        .status(200)
+        .json({ message: `Movie ${movieId} does not exist in our database` });
+    }
+
+    await movieService.updateMovie(
+      data,
+      {
+        where: {
+          id: movieId,
+        },
       },
-    });
+      transaction
+    );
+    await transaction.commit();
     res
       .status(200)
       .json({ data, message: `Movie ${movieId} has been updated` });
   } catch (err) {
+    transaction.rollback();
     next(err);
   }
 };
