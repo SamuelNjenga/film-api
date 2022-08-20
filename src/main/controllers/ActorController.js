@@ -37,9 +37,13 @@ exports.createActor = async (req, res, next) => {
 };
 
 exports.getActors = async (req, res, next) => {
+  const { page, size } = req.query;
+  const { limit, offset } = actorService.getPagination(page, size);
+
   try {
-    const actors = await actorService.getActors();
-    res.status(200).json(actors);
+    const actors = await actorService.getActors({ limit, offset });
+    const updatedActors = actorService.getPagingData(actors, page, limit);
+    res.status(200).json(updatedActors);
   } catch (err) {
     res.json({
       message: err,
