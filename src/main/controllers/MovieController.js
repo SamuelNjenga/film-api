@@ -33,9 +33,12 @@ exports.createMovie = async (req, res, next) => {
 };
 
 exports.getMovies = async (req, res, next) => {
+  const { page, size } = req.query;
+  const { limit, offset } = movieService.getPagination(page, size);
   try {
-    const movies = await movieService.getMovies();
-    res.status(200).json(movies);
+    const movies = await movieService.getMovies({ limit, offset });
+    const updatedMovies = movieService.getPagingData(movies, page, limit);
+    res.status(200).json(updatedMovies);
   } catch (err) {
     res.json({
       message: err,
