@@ -23,6 +23,13 @@ module.exports = (sequelize, DataTypes) => {
           allowNull: false,
         },
       });
+      Actor.hasMany(models.Message, {
+        onDelete: "restrict",
+        foreignKey: {
+          name: "actorId",
+          allowNull: false,
+        },
+      });
     }
   }
   Actor.init(
