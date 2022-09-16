@@ -12,8 +12,8 @@ exports.getMessages = async () => {
   return db.Message.findAll();
 };
 
-exports.getMessage = async (data) => {
-  return db.Message.findByPk(data);
+exports.getUnreadMessages = async (data) => {
+  return db.Message.findAll(data);
 };
 
 exports.deleteMessage = async (data) => {

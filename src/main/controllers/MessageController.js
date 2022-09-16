@@ -40,3 +40,21 @@ exports.getMessages = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getUnreadMessages = async (req, res, next) => {
+  try {
+    const actorId = req.params.id;
+    const messages = await messageService.getUnreadMessages({
+      where: {
+        actorId: actorId,
+        read: false,
+      },
+    });
+    res.status(200).json(messages);
+  } catch (err) {
+    res.json({
+      message: err,
+    });
+    next(err);
+  }
+};

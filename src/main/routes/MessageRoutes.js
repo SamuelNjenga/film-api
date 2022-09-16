@@ -6,5 +6,7 @@ const router = Router();
 
 router.post("/", messageController.createMessage);
 router.get("/", messageController.getMessages);
+router.get("/:id/message", messageController.getUnreadMessages);
+
 
 module.exports = router;
