@@ -98,12 +98,18 @@ exports.convertToRead = async (req, res, next) => {
         }
       );
 
-      const messages = await messageService.getReadUnreadMessages({
+      const allMessages = await messageService.getReadUnreadMessages({
         where: {
           actorId: data.actorId,
         },
       });
-      res.status(200).json(messages);
+      const unreadMessages = await messageService.getReadUnreadMessages({
+        where: {
+          actorId: data.actorId,
+          read: false,
+        },
+      });
+      res.status(200).json({allMessages,unreadMessages});
     }
   } catch (err) {
     res.json({
