@@ -85,8 +85,21 @@ exports.convertToRead = async (req, res, next) => {
 
     const message = await messageService.getMessage(data.messageId);
     if (message.read === true) {
+      const allMessages = await messageService.getReadUnreadMessages({
+        where: {
+          actorId: data.actorId,
+        },
+      });
+      const unreadMessages = await messageService.getReadUnreadMessages({
+        where: {
+          actorId: data.actorId,
+          read: false,
+        },
+      });
       res.json({
         message: "Message is already read",
+        allMessages,
+        unreadMessages,
       });
     } else {
       await messageService.updateMessage(
@@ -109,7 +122,7 @@ exports.convertToRead = async (req, res, next) => {
           read: false,
         },
       });
-      res.status(200).json({allMessages,unreadMessages});
+      res.status(200).json({ allMessages, unreadMessages });
     }
   } catch (err) {
     res.json({
