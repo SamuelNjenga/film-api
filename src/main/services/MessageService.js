@@ -12,7 +12,11 @@ exports.getMessages = async () => {
   return db.Message.findAll();
 };
 
-exports.getUnreadMessages = async (data) => {
+exports.getMessage = async (data) => {
+  return db.Message.findByPk(data);
+};
+
+exports.getReadUnreadMessages = async (data) => {
   return db.Message.findAll(data);
 };
 
