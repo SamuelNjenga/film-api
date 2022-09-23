@@ -131,3 +131,48 @@ exports.convertToRead = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.deleteMessage = async (req, res, next) => {
+  try {
+    const data = {
+      messageId: req.body.messageId,
+      actorId: req.body.actorId,
+    };
+
+    const message = await messageService.getMessage(data.messageId);
+
+    if (!message) {
+      return res.status(200).json({
+        message: `Message ${data.messageId} does not exist in our database`,
+      });
+    }
+
+    await messageService.deleteMessage({
+      where: {
+        id: data.messageId,
+      },
+    });
+
+    const allMessages = await messageService.getReadUnreadMessages({
+      where: {
+        actorId: data.actorId,
+      },
+    });
+    const unreadMessages = await messageService.getReadUnreadMessages({
+      where: {
+        actorId: data.actorId,
+        read: false,
+      },
+    });
+    res.status(200).json({
+      message: `Message ${data.messageId} has been deleted`,
+      allMessages,
+      unreadMessages,
+    });
+  } catch (err) {
+    res.json({
+      message: err,
+    });
+    next(err);
+  }
+};
