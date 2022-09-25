@@ -20,9 +20,27 @@ exports.createMessage = async (req, res, next) => {
 
     await messageService.createMessage(data, transaction);
 
+    const allMessages = await messageService.getReadUnreadMessages({
+      where: {
+        actorId: data.actorId,
+      },
+    });
+    const unreadMessages = await messageService.getReadUnreadMessages({
+      where: {
+        actorId: data.actorId,
+        read: false,
+      },
+    });
+
     await transaction.commit();
 
-    res.status(201).json({ data, message: `A new message has been created` });
+    res
+      .status(201)
+      .json({
+        allMessages,
+        unreadMessages,
+        message: `A new message has been created`,
+      });
   } catch (err) {
     transaction.rollback();
     next(err);
@@ -138,6 +156,9 @@ exports.deleteMessage = async (req, res, next) => {
       messageId: req.body.messageId,
       actorId: req.body.actorId,
     };
+
+    console.log("MSG ID", data.messageId);
+    console.log("ACTOR ID", data.actorId);
 
     const message = await messageService.getMessage(data.messageId);
 
