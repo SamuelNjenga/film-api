@@ -52,6 +52,18 @@ exports.getActors = async (req, res, next) => {
   }
 };
 
+exports.getAllActors = async (req, res, next) => {
+  try {
+    const actors = await actorService.getAllActors();
+    res.status(200).json(actors);
+  } catch (err) {
+    res.json({
+      message: err,
+    });
+    next(err);
+  }
+};
+
 exports.updateActor = async (req, res, next) => {
   const transaction = await sequelize.transaction();
   try {
